@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Equipment Manager</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #f8f9fa;
+            font-family: "Poppins", sans-serif;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            background: #1e1e1e;
+            padding: 25px 15px;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .profile-section {
+            text-align: center;
+        }
+        .profile-section img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 2px solid #0dcaf0;
+        }
+        .profile-section h5 {
+            margin: 5px 0;
+            color: #f8f9fa;
+        }
+        .sidebar-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sidebar-buttons button {
+            background: none;
+            border: none;
+            color: #f8f9fa;
+            padding: 10px 15px;
+            text-align: left;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+        .sidebar-buttons button:hover,
+        .sidebar-buttons button.active {
+            background-color: #0dcaf0;
+            color: #121212;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #bb2d3b;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 270px;
+            padding: 30px;
+            flex-grow: 1;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .search-bar {
+            width: 300px;
+            background: #1e1e1e;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        /* 🔹 Add Button moved to bottom-right */
+        .btn-add {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #0dcaf0;
+            color: #121212;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            z-index: 10;
+        }
+        .btn-add:hover {
+            background-color: #0bb8de;
+        }
+
+        /* Modal, Input/Textarea, etc. styling remains */
+        input,
+        textarea {
+            background-color: #2c2c2c !important;
+            border: none !important;
+            color: #f8f9fa !important;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            color: #f8f9fa;
+        }
+
+        /* 🔹 Save button in profile fixed bottom-right */
+        #profileSection {
+            position: relative;
+            min-height: calc(100vh - 100px);
+            padding-bottom: 80px;
+        }
+
+        #saveProfileBtn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #0dcaf0;
+            color: #121212;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            z-index: 10;
+        }
+        #saveProfileBtn:hover {
+            background-color: #0bb8de;
+        }
+        
+        /* ENHANCED TABLE STYLING FOR PROFESSIONAL LOOK (Tailwind classes recreated) */
+        .overflow-x-auto { overflow-x: auto; }
+        .w-full { width: 100%; }
+        .table-auto { table-layout: auto; }
+        .text-sm { font-size: 0.875rem; }
+        .text-left { text-align: left; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-cyan-400 { color: #4dd0e1; }
+        .uppercase { text-transform: uppercase; }
+        .bg-gray-700 { background-color: #374151; }
+        .bg-gray-800 { background-color: #1f2937; }
+        .bg-gray-900 { background-color: #111827; }
+        .border-b { border-bottom-width: 1px; }
+        .border-gray-700 { border-color: #374151; }
+        .hover\:bg-gray-700:hover { background-color: #374151; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .w-\[5\%\] { width: 5%; }
+        .w-\[10\%\] { width: 10%; }
+        .w-\[25\%\] { width: 25%; }
+        .w-\[40\%\] { width: 40%; }
+        .text-white { color: #ffffff; }
+        .font-semibold { font-weight: 600; }
+        .text-green-400 { color: #4ade80; }
+        .font-bold { font-weight: 700; }
+        .text-xs { font-size: 0.75rem; }
+        .max-w-lg { max-width: 32rem; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
+        .text-yellow-400 { color: #facc15; }
+        .hover\:text-yellow-300:hover { color: #fde047; }
+        .text-red-500 { color: #ef4444; }
+        .hover\:text-red-400:hover { color: #f87171; }
+        .transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; }
+        .w-16 { width: 4rem; }
+        .h-16 { height: 4rem; }
+        .object-cover { object-fit: cover; }
+        .rounded-md { border-radius: 0.375rem; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <div class="profile-section">
+                <img
+                    id="profileImage"
+                    src="http://localhost:8000/storage/user_profiles/default.png"
+                    alt="Profile"
+                />
+                <h5 id="userFullName">Loading....</h5>
+            </div>
+            <div class="sidebar-buttons mt-4">
+                <button id="equipmentBtn" class="active">🧰 Manage Equipment</button>
+                <button id="profileBtn">👤 Edit Profile</button>
+            </div>
+        </div>
+        <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
+    </div>
+
+    <div class="content">
+        <div id="equipmentSection">
+            <div class="content-header">
+                <h2>Equipment Inventory</h2>
+                <input
+                    type="text"
+                    class="search-bar"
+                    id="searchInput"
+                    placeholder="Search equipment..."
+                />
+            </div>
+            
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full table-auto text-sm text-left text-gray-400">
+                    <thead class="text-xs text-cyan-400 uppercase bg-gray-700">
+                        <tr>
+                            <th scope="col" class="py-3 px-2 w-[5%]">ID</th>
+                            <th scope="col" class="py-3 px-6 w-[10%]">Image</th>
+                            <th scope="col" class="py-3 px-6 w-[25%]">Name</th>
+                            <th scope="col" class="py-3 px-6 w-[10%]">Price</th>
+                            <th scope="col" class="py-3 px-6 w-[40%]">Description</th>
+                            <th scope="col" class="py-3 px-4 w-[10%] text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipmentTable">
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button id="addBtn" class="btn-add">➕ Add Equipment</button>
+        </div>
+
+        <div id="profileSection" style="display:none;">
+            <h2>Edit Profile</h2>
+            <form id="profileForm" class="mt-4">
+                <div class="mb-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" id="firstName" name="firstname" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" id="lastName" name="lastname" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="text" id="email" name="email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Profile Image</label>
+                    <input
+                        type="file"
+                        id="profileImageFile"
+                        name="image" class="form-control"
+                        accept="image/*"
+                    />
+                    <div class="mt-2 text-center">
+                        <img
+                            id="previewProfile"
+                            src="http://localhost:8000/storage/user_profiles/default.png"
+                            width="100"
+                            class="rounded shadow-sm mt-2"
+                        />
+                    </div>
+                </div>
+                <button id="saveProfileBtn" type="submit">💾 Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div
+        class="modal fade"
+        id="equipmentModal"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="modalTitle">Add Equipment</h5>
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                    ></button>
+                </div>
+                
+                <form id="equipmentForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="equipmentId" name="id" /> 
+                        <div class="mb-3">
+                            <label class="form-label">Equipment Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" id="price" name="price" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image</label>
+                            <input type="file" id="image" name="image" class="form-control" accept="image/*" />
+                            <div class="mt-2 text-center">
+                                <img
+                                    id="previewImage"
+                                    src=""
+                                    alt=""
+                                    width="100"
+                                    class="rounded shadow-sm mt-2"
+                                    style="display:none;"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-info">Save</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const API_BASE = "http://127.0.0.1:8000/api";
+    const TOKEN = localStorage.getItem("Token");
+    if (!TOKEN) window.location.href = "index.html";
+
+    // Use jQuery selectors for elements
+    const $tableBody = $("#equipmentTable");
+    const MODAL = new bootstrap.Modal(document.getElementById("equipmentModal"));
+    const $previewImage = $("#previewImage");
+    const $equipmentForm = $("#equipmentForm");
+    const $profileForm = $("#profileForm");
+
+    // Sidebar switching (keeping native event listeners as they were simple)
+    const equipmentBtn = document.getElementById("equipmentBtn");
+    const profileBtn = document.getElementById("profileBtn");
+    const equipmentSection = document.getElementById("equipmentSection");
+    const profileSection = document.getElementById("profileSection");
+
+    equipmentBtn.addEventListener("click", () => {
+        equipmentSection.style.display = "block";
+        profileSection.style.display = "none";
+        equipmentBtn.classList.add("active");
+        profileBtn.classList.remove("active");
+    });
+
+    profileBtn.addEventListener("click", () => {
+        equipmentSection.style.display = "none";
+        profileSection.style.display = "block";
+        profileBtn.classList.add("active");
+        equipmentBtn.classList.remove("active");
+        loadUserProfile(); // Reload profile data when switching view
+    });
+
+    // Logout
+    $("#logoutBtn").on("click", () => {
+        // We will call the API logout endpoint you defined
+        $.ajax({
+            url: `${API_BASE}/logout`,
+            method: 'POST',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            complete: function() {
+                localStorage.removeItem("Token");
+                window.location.href = "index.html";
+            }
+        });
+    });
+
+    // Handle file preview change for Profile Image
+    $("#profileImageFile").on("change", function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                $("#previewProfile").attr("src", event.target.result);
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Handle file preview change for Equipment Image
+    $("#image").on("change", function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                $previewImage.attr("src", event.target.result).show();
+            };
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            // If the user clears the file, hide the preview
+            $previewImage.attr("src", "").hide();
+        }
+    });
+
+
+    // 🔹 Load user profile info - UPDATED ROUTE TO /user/profile
+    function loadUserProfile() {
+        $.ajax({
+            // TARGETING YOUR DEFINED ROUTE: /user/profile
+            url: `${API_BASE}/user/profile`, 
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(result) { 
+                const user = result.data || result;
+                if (!user) return;
+
+                const baseUrl = API_BASE.replace("/api", "");
+
+                // ✔ Profile fields
+                $("#email").val(user.email || '');
+                $("#username").val(user.username || '');
+                $("#firstName").val(user.firstname || '');
+                $("#lastName").val(user.lastname || '');
+
+                const profileImgPath = user.image
+                    ? user.image 
+                    : 'user_profiles/default.png';
+                
+                const profileImg = `${baseUrl}/${profileImgPath}`;
+
+                $("#userFullName").text(`${user.firstname || ''} ${user.lastname || ''}`);
+                $("#profileImage").attr("src", profileImg);
+                $("#previewProfile").attr("src", profileImg);
+            },
+            error: function(jqXHR) {
+                console.error("Error loading user:", jqXHR.responseJSON || jqXHR.responseText);
+                $("#userFullName").text("Error Loading");
+            }
+        });
+    }
+
+    // 🔹 Update profile info - UPDATED ROUTE TO /user/profile (POST with PUT override)
+    function updateProfile() {
+        const formData = new FormData(document.getElementById("profileForm"));
+        formData.append("_method", "PUT"); // Matches your backend route definition
+
+        if (!$("#profileImageFile").val()) {
+             formData.delete("image");
+        }
+
+        $.ajax({
+            // TARGETING YOUR DEFINED ROUTE: /user/profile
+            url: `${API_BASE}/user/profile`, 
+            method: "POST", // Must be POST due to the PUT override in the form data
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            data: formData,
+            processData: false, 
+            contentType: false, 
+            success: function(data) {
+                alert("Profile updated successfully!");
+                loadUserProfile(); 
+            },
+            error: function(jqXHR) {
+                const errorData = jqXHR.responseJSON || { error: "Unknown error" };
+                console.error("Update failed:", errorData);
+                alert("Update failed: " + (errorData.message || errorData.error || "Please check console for details."));
+            }
+        });
+    }
+
+    // 🔹 Load all equipment - NO ROUTE CHANGE (Relies on Route::apiResource('equipment', ...))
+    function loadEquipment(searchTerm = "") {
+        const url = searchTerm ? `${API_BASE}/equipment?search=${encodeURIComponent(searchTerm)}` : `${API_BASE}/equipment`;
+        
+        $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td></tr>`);
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(data) {
+                const equipmentData = data.data || data; 
+                const baseUrl = API_BASE.replace("/api", "");
+
+                if (equipmentData && equipmentData.length) {
+                    let html = "";
+                    equipmentData.forEach((eq, index) => {
+                        const imgPath = eq.image 
+                            ? eq.image
+                            : 'user_profiles/default.png';
+                        const imgUrl = `${baseUrl}/${imgPath}`;
+
+                        const rowBgClass = index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900';
+
+                        html += `
+                            <tr class="border-b border-gray-700 hover:bg-gray-700 ${rowBgClass}">
+                                
+                                <td class="py-3 px-2 font-medium text-white whitespace-nowrap">${eq.id}</td>
+
+                                <td class="py-2 px-6">
+                                    <img 
+                                        src="${imgUrl}" 
+                                        onerror="this.src='${baseUrl}/user_profiles/default.png'" 
+                                        alt="${eq.name}"
+                                        class="w-16 h-16 object-cover rounded-md"
+                                    >
+                                </td>
+
+                                <td class="py-4 px-6 text-white font-semibold">${eq.name || "—"}</td>
+
+                                <td class="py-4 px-6 text-green-400 font-bold">$${parseFloat(eq.price).toFixed(2) || "0.00"}</td>
+
+                                <td class="py-4 px-6">
+                                    <p class="text-xs max-w-lg truncate" title="${eq.description || ''}">${eq.description || "No description provided."}</p>
+                                </td>
+
+                                <td class="py-4 px-4 text-center space-x-2">
+                                    <button class="text-yellow-400 hover:text-yellow-300 transition" 
+                                            onclick="editEquipment(${eq.id})" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-400 transition" 
+                                            onclick="deleteEquipment(${eq.id})" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+
+                            </tr>
+                        `;
+                    });
+                    $tableBody.html(html);
+                } else {
+                    $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">No equipment found.</td></tr>`);
+                }
+            },
+            error: function(jqXHR) {
+                console.error("Error loading equipment:", jqXHR.responseJSON || jqXHR.responseText);
+                $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-red-400 bg-gray-800">Failed to load equipment data. Check your API token or server status.</td></tr>`);
+            }
+        });
+    }
+
+    // Global function used by the onclick handlers
+    window.editEquipment = function(id) {
+        // Relies on Route::apiResource('equipment', ...) -> GET /api/equipment/{id}
+        $.ajax({
+            url: `${API_BASE}/equipment/${id}`,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(result) {
+                const eq = result.data || result;
+                
+                $("#equipmentId").val(eq.id);
+                $("#name").val(eq.name);
+                $("#price").val(eq.price);
+                $("#description").val(eq.description);
+                
+                $("#image").val(""); 
+
+                const baseUrl = API_BASE.replace("/api", "");
+                const imgSrc = eq.image ? `${baseUrl}/${eq.image}` : `${baseUrl}/user_profiles/default.png`;
+                
+                $previewImage.attr("src", imgSrc).show();
+
+                $("#modalTitle").text("Edit Equipment");
+                MODAL.show();
+            },
+            error: function(jqXHR) {
+                console.error("Error fetching equipment:", jqXHR.responseJSON || jqXHR.responseText);
+            }
+        });
+    }
+
+    window.deleteEquipment = function(id) {
+        // Relies on Route::apiResource('equipment', ...) -> DELETE /api/equipment/{id}
+        if (!confirm("Are you sure you want to delete this equipment?")) return;
+        
+        $.ajax({
+            url: `${API_BASE}/equipment/${id}`,
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function() {
+                loadEquipment();
+            },
+            error: function(jqXHR) {
+                console.error("Error deleting equipment:", jqXHR.responseJSON || jqXHR.responseText);
+                alert("Failed to delete equipment. Check your server permissions.");
+            }
+        });
+    }
+
+    // 🔹 Add new equipment
+    $("#addBtn").on("click", () => {
+        $equipmentForm[0].reset();
+        $("#equipmentId").val("");
+        $previewImage.attr("src", "").hide();
+        $("#modalTitle").text("Add Equipment");
+        MODAL.show();
+    });
+
+    // 🔹 Submit add/edit equipment 
+    $equipmentForm.on("submit", function(e) {
+        e.preventDefault();
+
+        const id = $("#equipmentId").val();
+        let method = "POST"; // Always POST for file upload forms with method override
+        const url = id ? `${API_BASE}/equipment/${id}` : `${API_BASE}/equipment`;
+
+        const formData = new FormData(this); 
+
+        // Add method override for updates (Laravel/Resource convention)
+        if (id) formData.append("_method", "PUT");
+        
+        // Remove empty file input if not changed on update
+        if (id && !$("#image").val()) {
+             formData.delete("image");
+        }
+
+        $.ajax({
+            url: url,
+            method: method, 
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            data: formData,
+            processData: false, 
+            contentType: false, 
+            success: function(result) {
+                MODAL.hide();
+                loadEquipment(); // refresh table
+            },
+            error: function(jqXHR) {
+                const result = jqXHR.responseJSON || { error: "Unknown error", message: "Error in request, see console." };
+                console.error("Save error:", result);
+                alert("Failed to save equipment. Check the server response in the console.");
+            }
+        });
+    });
+
+    // Search input listener
+    $("#searchInput").on('keyup', function() {
+        const searchTerm = $(this).val();
+        loadEquipment(searchTerm); 
+    });
+
+
+    // Profile form submission
+    $profileForm.on("submit", function(e) {
+        e.preventDefault(); 
+        updateProfile();
+    });
+
+    // Initial load
+    loadUserProfile();
+    loadEquipment();
+</script>
+</body>
+</html>

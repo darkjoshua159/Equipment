@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f1c2b;
+      --bg-gradient: linear-gradient(135deg, #1a2a3a, #0d1620);
+      --neon-blue: #00e5ff;
+      --neon-blue-light: #00ffff;
+      --text-white: #ffffff;
+      --error-neon: #ff0055;
+      --success-neon: #39ff14;
+      --link-hover-red: #ff4c4c;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      width: 100%;
+      background: rgba(15, 28, 43, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 229, 255, 0.1);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2), 0 0 30px rgba(0, 229, 255, 0.1);
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+      color: var(--text-white);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .container:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 229, 255, 0.4), 0 0 60px rgba(0, 229, 255, 0.3);
+    }
+    h2 {
+      margin-bottom: 25px;
+      color: var(--text-white);
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .input-group {
+      position: relative;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 14px 18px;
+      padding-right: 50px;
+      border: 2px solid rgba(0, 229, 255, 0.2);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    input:focus {
+      border-color: var(--neon-blue);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.3), 0 0 15px var(--neon-blue);
+      outline: none;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+    .toggle-password:hover {
+      color: var(--neon-blue-light);
+      text-shadow: 0 0 10px var(--neon-blue-light);
+    }
+    button {
+      width: 60%;
+      padding: 15px;
+      background: var(--neon-blue);
+      color: var(--bg-dark);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: var(--neon-blue-light);
+      box-shadow: 0 0 20px var(--neon-blue-light), 0 0 40px var(--neon-blue-light);
+      animation: pulse 1.5s infinite;
+    }
+    .link {
+      color: var(--text-white);
+      text-decoration: none;
+      font-size: 14px;
+      display: block;
+    }
+    .link:hover {
+      color: var(--link-hover-red);
+    }
+    .error, .success {
+      margin-bottom: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .error { color: var(--error-neon); }
+    .success { color: var(--success-neon); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue); }
+      50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="container">
+    <h2>Sign In</h2>
+    <p id="message" class=""></p>
+
+    <form id="loginForm">
+      <div class="input-group">
+        <input type="text" name="username" placeholder="Username" required>
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <span class="toggle-password" onclick="togglePassword()">👁</span>
+      </div>
+      <button type="submit" id="loginBtn">Login</button>
+    </form>
+
+    <div> 
+      <a href="forgot.html" class="link">Forgot your password?</a>
+      <a href="register.html" class="link">Don't have an account? Sign up</a>
+    </div>
+  </div>
+  
+<script>
+// IMPORTANT: Change this to your actual deployed Laravel API base URL.
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+const LOGIN_URL = `${API_BASE_URL}/login`;
+const DASHBOARD_PAGE = "dashboard.html"; // Your main app page
+
+// Helper function to set the status message style using jQuery
+function setStatus(message, type) {
+    // This function is defined globally to be accessible by the main logic.
+    $('#message').text(message).removeClass('error success info').addClass(type);
+}
+
+// Function to toggle password visibility (accessible globally because it's attached via inline HTML)
+function togglePassword() {
+    const passwordField = document.getElementById("password");
+    if (passwordField) {
+        passwordField.type = passwordField.type === "password" ? "text" : "password";
+    }
+}
+
+// Use jQuery ready function for initialization and logic
+$(function() {
+    const $loginForm = $("#loginForm");
+    const $loginBtn = $("#loginBtn");
+
+    // --- CRITICAL FIX 1: Check for Token and Redirect ---
+    if (localStorage.getItem("Token")) {
+        // If a token exists, redirect immediately to the dashboard.
+        window.location.href = DASHBOARD_PAGE;
+        return; // Stop further execution of the script
+    }
+    
+
+    $loginForm.on("submit", function(e) {
+        e.preventDefault();
+        
+        // Collect form data using jQuery
+        const formData = {
+            username: $loginForm.find('input[name="username"]').val(),
+            password: $loginForm.find('input[name="password"]').val()
+        };
+
+        // Disable button and set status
+        $loginBtn.prop('disabled', true);
+        $loginBtn.text("Logging In...");
+        setStatus("Processing...", "info");
+
+        // --- jQuery AJAX Call ---
+        $.ajax({
+            url: LOGIN_URL,
+            method: 'POST',
+            contentType: 'application/json', // Important for Laravel API
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            timeout: 10000,
+
+            success: function(response) {
+                console.log('Login Success:', response);
+
+                // ✅ If login is successful (check for token)
+                if (response.token) {
+                    setStatus("Login successful! Redirecting...", "success");
+                    // Store the Sanctum token
+                    localStorage.setItem("Token", response.token);
+                    $loginBtn.text("Success!");
+                    
+                    setTimeout(() => (window.location.href = DASHBOARD_PAGE), 1000);
+                    // Return here to prevent 'complete' from re-enabling the button
+                    return; 
+                } else {
+                    setStatus(response.message || "Login failed due to unknown reason.", "error");
+                }
+            },
+
+            error: function(xhr) {
+                let errorMessage = "Network error. Please ensure the Laravel server is running.";
+                
+                try {
+                    const responseData = JSON.parse(xhr.responseText);
+
+                    // 🛑 SCENARIO 1: Account is Pending Verification (403 or specific status flag)
+                    if (xhr.status === 403 && responseData.status === 'pending_verification') {
+                        errorMessage = responseData.message || "Account pending verification. Redirecting to verify...";
+                        setStatus(errorMessage, "error");
+                        
+                        // Redirect to verification page with user_id
+                        const userId = responseData.user_id;
+                        setTimeout(() => {
+                            window.location.href = `verify.html?user_id=${userId}`;
+                        }, 1500);
+                        return; // Stop here if redirecting
+                    } 
+                    
+                    // 🛑 SCENARIO 2: Validation Error (Invalid credentials - 422 or 401)
+                    else if (xhr.status === 422 || xhr.status === 401) {
+                        // Laravel Validation error messages are usually under the 'errors' object
+                        // Fallback to general message
+                        errorMessage = responseData.errors?.username?.[0] || responseData.errors?.email?.[0] || responseData.message || 'Invalid username or password.';
+                    } 
+                    
+                    // 🛑 SCENARIO 3: Other Errors
+                    else if (xhr.status !== 0) {
+                        errorMessage = responseData.message || `Server Error (${xhr.status}).`;
+                    }
+                } catch(e) {
+                    // Handle non-JSON or status 0 (network down) errors
+                    if (xhr.status === 0) {
+                        errorMessage = "Cannot connect to the API server. Check your API_BASE_URL.";
+                    } else if (xhr.status !== 0) {
+                        errorMessage = `Server Error (${xhr.status}). Failed to parse response.`;
+                    }
+                }
+                
+                setStatus(errorMessage, "error");
+            },
+            
+            complete: function() {
+                // Only re-enable the button if no redirect has started
+                // Check if the button still has the 'Logging In...' text, meaning no success/redirect occurred
+                if ($loginBtn.text() === "Logging In...") {
+                     $loginBtn.prop('disabled', false).text("Login");
+                }
+            }
+        });
+    });
+    
+});
+</script>
+</body>
+</html>

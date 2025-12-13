@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f1c2b;
+      --bg-gradient: linear-gradient(135deg, #1a2a3a, #0d1620);
+      --neon-blue: #00e5ff;
+      --neon-blue-light: #00ffff;
+      --text-white: #ffffff;
+      --error-neon: #ff0055;
+      --success-neon: #39ff14;
+      --link-hover-red: #ff4c4c;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      width: 100%;
+      background: rgba(15, 28, 43, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 229, 255, 0.1);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2),
+                  0 0 30px rgba(0, 229, 255, 0.1);
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+      color: var(--text-white);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .container:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 0 20px var(--neon-blue),
+                  0 0 40px rgba(0, 229, 255, 0.4),
+                  0 0 60px rgba(0, 229, 255, 0.3);
+    }
+    h2 {
+      margin-bottom: 25px;
+      color: var(--text-white);
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .input-group {
+      position: relative;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid rgba(0, 229, 255, 0.2);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    input:focus {
+      border-color: var(--neon-blue);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.3),
+                  0 0 15px var(--neon-blue);
+      outline: none;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    button {
+      width: 60%;
+      padding: 15px;
+      background: var(--neon-blue);
+      color: var(--bg-dark);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: var(--neon-blue-light);
+      box-shadow: 0 0 20px var(--neon-blue-light),
+                  0 0 40px var(--neon-blue-light);
+      animation: pulse 1.5s infinite;
+    }
+    .link {
+      color: var(--text-white);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .link:hover { color: var(--link-hover-red); }
+    .message {
+      margin-bottom: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .success { color: var(--success-neon); }
+    .error { color: var(--error-neon); }
+    .info { color: var(--neon-blue-light); } /* Added for 'Processing...' */
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue); }
+      50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+      100% { box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Verify OTP</h2>
+    <form id="verifyForm" novalidate>
+      <div class="input-group">
+        <input type="text" id="otp" name="otp" placeholder="Enter OTP" required>
+      </div>
+      <button type="submit" id="verifyBtn">Verify</button>
+    </form>
+    <p id="message" class="message"></p>
+    <p><a href="index.html" class="link">Back to Login</a></p>
+  </div>
+
+<script>
+    // IMPORTANT: Update this URL to your actual deployed Laravel API base URL.
+    const API_BASE = "http://127.0.0.1:8000/api";
+    const VERIFY_URL = `${API_BASE}/verify`;
+    const LOGIN_PAGE = "index.html"; 
+
+    // Helper function to set the status message style
+    function setStatus(message, type) {
+        // Use jQuery for element selection and manipulation
+        $('#message').text(message).removeClass('error success info').addClass(type);
+    }
+
+    // Use jQuery ready function for initialization
+    $(function() {
+        const $message = $('#message');
+        const $verifyForm = $('#verifyForm');
+        const $otpInput = $('#otp');
+        const $verifyBtn = $verifyForm.find("button[type='submit']");
+        
+        let isVerifying = false;
+
+        // --- STEP 1: Get User ID from URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id'); 
+
+        // Initial check: if no user ID, show an error and redirect
+        if (!userId) {
+            setStatus("Error: Missing user ID for verification. Redirecting to login...", "error");
+            // Redirect to LOGIN_PAGE (index.html)
+            setTimeout(() => window.location.href = LOGIN_PAGE, 2000); 
+            // Prevent form submission if no ID is available
+            $verifyBtn.prop('disabled', true);
+            return; // Stop execution here
+        }
+
+
+        $verifyForm.on("submit", function(e) {
+            e.preventDefault();
+
+            if (isVerifying || !userId) return; 
+            isVerifying = true;
+
+            $verifyBtn.prop('disabled', true).text("Verifying...");
+            setStatus("Processing...", "info");
+
+            const otp = $otpInput.val().trim();
+
+            const payload = {
+                user_id: userId,
+                otp: otp
+            };
+            
+            // Basic client-side validation for empty field
+            if (!otp) {
+                setStatus("Please enter the OTP.", "error");
+                isVerifying = false;
+                $verifyBtn.prop('disabled', false).text("Verify");
+                return;
+            }
+
+            // --- jQuery AJAX Call (Conversion from Axios) ---
+            $.ajax({
+                url: VERIFY_URL,
+                method: 'POST',
+                contentType: 'application/json', 
+                data: JSON.stringify(payload),
+                dataType: 'json',
+                timeout: 10000,
+
+                success: function(response) {
+                    console.log('Verification Success:', response);
+                    
+                    // Check for token or success status expected from Laravel API
+                    if (response.token || response.success) {
+                        setStatus(response.message || "Verification successful! Redirecting to Login...", "success");
+                        $verifyBtn.text("Success!");
+                        
+                        // ⭐ Redirect to LOGIN_PAGE (index.html)
+                        setTimeout(() => (window.location.href = LOGIN_PAGE), 1500);
+                    } else {
+                        // Handle success response but with a failure message (e.g., OTP incorrect but structure is 200)
+                        setStatus(response.message || "Verification failed. Please check the code.", "error");
+                    }
+                },
+
+                error: function(xhr, status, error) {
+                    let errorMessage = "Network Error. Could not connect to the API. Check your connection or the API_BASE URL.";
+                    
+                    try {
+                        const responseData = JSON.parse(xhr.responseText);
+                        
+                        if (xhr.status === 400 || xhr.status === 401) {
+                            errorMessage = responseData.message || 'Invalid or expired verification code.';
+                        } else if (xhr.status === 422) {
+                            // Validation errors
+                            const errors = responseData.errors;
+                            errorMessage = errors?.otp?.[0] || responseData.message || 'Please enter a valid OTP.';
+                        } else if (xhr.status !== 0) {
+                            // All other server errors
+                            errorMessage = responseData.message || `Server Error (${xhr.status}).`;
+                        }
+                    } catch(e) {
+                        // Handle non-JSON or status 0 (network down) errors
+                        if (xhr.status !== 0) {
+                            errorMessage = `Server Error (${xhr.status}).`;
+                        }
+                    }
+
+                    console.error('Verification Error:', xhr, status, error);
+                    setStatus(errorMessage, "error");
+                },
+                
+                complete: function() {
+                    isVerifying = false;
+                    // Only re-enable the button if verification was NOT successful (i.e., no redirect started)
+                    if ($verifyBtn.text() !== "Success!") {
+                        $verifyBtn.prop('disabled', false).text("Verify");
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

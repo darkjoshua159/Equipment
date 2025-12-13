@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <!-- Load jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f1c2b;
+            --bg-gradient: linear-gradient(135deg, #1a2a3a, #0d1620);
+            --neon-blue: #00e5ff;
+            --neon-blue-light: #00ffff;
+            --text-white: #ffffff;
+            --error-neon: #ff0055;
+            --success-neon: #39ff14;
+            --info-neon: #ffaa00; /* New color for info messages */
+            --link-hover-red: #ff4c4c;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(15, 28, 43, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2),
+                        0 0 30px rgba(0, 229, 255, 0.1);
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+            color: var(--text-white);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .container:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 20px var(--neon-blue),
+                        0 0 40px rgba(0, 229, 255, 0.4),
+                        0 0 60px rgba(0, 229, 255, 0.3);
+        }
+        h2 { margin-bottom: 25px; color: var(--text-white); }
+        .input-group { position: relative; width: 100%; margin-bottom: 30px; }
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(0, 229, 255, 0.2);
+            border-radius: 10px;
+            font-size: 16px;
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: var(--neon-blue);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.3),
+                        0 0 15px var(--neon-blue);
+            outline: none;
+        }
+        input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        button {
+            width: 60%;
+            padding: 15px;
+            background: var(--neon-blue);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        button:hover:not(:disabled) {
+            transform: scale(1.05);
+            background: var(--neon-blue-light);
+            box-shadow: 0 0 20px var(--neon-blue-light), 0 0 40px var(--neon-blue-light);
+            animation: pulse 1.5s infinite;
+        }
+        button:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+        }
+        .link { color: var(--text-white); text-decoration: none; font-size: 14px; }
+        .link:hover { color: var(--link-hover-red); }
+        .error, .success, .info { margin-bottom: 15px; font-size: 14px; font-weight: bold; padding: 10px; border-radius: 8px; }
+        .error { color: var(--error-neon); border: 1px solid var(--error-neon); background: rgba(255, 0, 85, 0.1); }
+        .success { color: var(--success-neon); border: 1px solid var(--success-neon); background: rgba(57, 255, 20, 0.1); }
+        .info { color: var(--info-neon); border: 1px solid var(--info-neon); background: rgba(255, 170, 0, 0.1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue); }
+            50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+            100% { box-shadow: 0 0 15px var(--neon-blue), 0 0 25px var(--neon-blue); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Forgot Password</h2>
+
+        <!-- Step 1: Email -->
+        <div id="step1">
+            <div class="input-group">
+                <!-- Changed type to email for better UX -->
+                <input type="email" id="email" placeholder="Enter your Email" required>
+            </div>
+            <button id="sendOtpBtn">Send OTP</button>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div id="step2" style="display:none;">
+            <div class="input-group">
+                <input type="text" id="otp" placeholder="Enter OTP" required>
+            </div>
+            <button id="verifyOtpBtn">Verify OTP</button>
+        </div>
+
+        <!-- Step 3: New Password -->
+        <div id="step3" style="display:none;">
+            <div class="input-group">
+                <input type="password" id="newPassword" placeholder="Enter new password" required>
+            </div>
+            <!-- Added Confirm Password field for validation -->
+             <div class="input-group">
+                <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+            </div>
+            <button id="resetPasswordBtn">Reset Password</button>
+        </div>
+
+        <!-- Message containers. Hidden by default, controlled by JS. -->
+        <p id="errorMsg" class="error" style="display:none;"></p>
+        <p id="successMsg" class="success" style="display:none;"></p>
+        <p id="infoMsg" class="info" style="display:none;"></p> 
+
+        <a href="index.html" class="link">Back to Login</a>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000/api";
+        let currentEmail = "";
+
+        // Map elements using jQuery for consistent access
+        const $errorMsg = $("#errorMsg");
+        const $successMsg = $("#successMsg");
+        const $infoMsg = $("#infoMsg");
+        
+        const $step1 = $("#step1");
+        const $step2 = $("#step2");
+        const $step3 = $("#step3");
+
+        const $sendOtpBtn = $("#sendOtpBtn");
+        const $verifyOtpBtn = $("#verifyOtpBtn");
+        const $resetPasswordBtn = $("#resetPasswordBtn");
+        
+        // --- Utility Functions ---
+
+        /**
+         * Clears all displayed messages.
+         */
+        function clearMessages() {
+            $errorMsg.hide().html('');
+            $successMsg.hide().html('');
+            $infoMsg.hide().html('');
+        }
+
+        /**
+         * Displays a status message to the user.
+         * @param {string} type - The message type ('error', 'success', or 'info').
+         * @param {string} msg - The message content.
+         */
+        function showMessage(type, msg) {
+            clearMessages(); // Clear existing messages first
+
+            if (type === 'error') {
+                $errorMsg.html(msg).show();
+            } else if (type === 'success') {
+                $successMsg.html(msg).show();
+            } else {
+                $infoMsg.html(msg).show();
+            }
+            
+            // Auto-clear error/success messages after 4 seconds
+            if (type === 'error' || type === 'success') {
+                setTimeout(() => { 
+                    clearMessages();
+                }, 4000);
+            }
+        }
+
+        /**
+         * Handles server response processing for jQuery AJAX.
+         * @param {object} xhr - The jQuery XMLHttpRequest object.
+         * @returns {string} The derived error message.
+         */
+        function getErrorMessage(xhr) {
+            let errorMessage = "Network error. Please ensure the server is running.";
+            if (xhr.status === 0) return "Cannot connect to the API server. Check your API_BASE URL.";
+
+            try {
+                const responseData = xhr.responseJSON;
+                
+                // Handle common HTTP error codes and check for Laravel validation errors
+                if (xhr.status === 422 || xhr.status === 401 || xhr.status === 404) {
+                    // Check for Laravel validation errors (errors object) or use the general message
+                    // Note: API validation keys might vary (e.g., 'password' vs 'new_password')
+                    const errors = responseData.errors;
+                    if (errors) {
+                        errorMessage = errors.email?.[0] || errors.otp?.[0] || errors.newPassword?.[0] || errors.password?.[0] || responseData.message || 'Validation failed for input provided.';
+                    } else {
+                        errorMessage = responseData.message || 'An error occurred with the input provided.';
+                    }
+                } else {
+                    errorMessage = responseData?.message || `Server Error (${xhr.status}). Failed to process request.`;
+                }
+            } catch(e) {
+                errorMessage = `Server Error (${xhr.status}). Failed to parse response.`;
+            }
+            return errorMessage;
+        }
+
+        // Use jQuery ready function to ensure the DOM is loaded
+        $(function() {
+            
+            // --- Step 1: Send OTP ---
+            $sendOtpBtn.on('click', function() {
+                const email = $("#email").val().trim();
+                
+                if (!email) {
+                    return showMessage("error", "Please enter your email.");
+                }
+
+                $sendOtpBtn.prop('disabled', true).text("Sending...");
+                showMessage("info", "Requesting reset code...");
+                
+                $.ajax({
+                    url: `${API_BASE}/forgot-password`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: email }),
+                    dataType: 'json',
+
+                    success: function(response) {
+                        currentEmail = email; // Store the email for subsequent steps
+                        showMessage("success", response.message || "OTP sent successfully! Check your inbox. Proceed to Step 2.");
+                        
+                        // Transition to Step 2 after showing success message
+                        setTimeout(() => { 
+                            clearMessages(); // Clear success message upon transition
+                            $step1.hide();
+                            $step2.show();
+                            $("#otp").focus();
+                        }, 2000); 
+
+                    },
+
+                    error: function(xhr) {
+                        const message = getErrorMessage(xhr);
+                        showMessage("error", message);
+                    },
+                    
+                    complete: function() {
+                        $sendOtpBtn.prop('disabled', false).text("Send OTP");
+                    }
+                });
+            });
+
+            // --- Step 2: Verify OTP ---
+            $verifyOtpBtn.on('click', function() {
+                const otp = $("#otp").val().trim();
+                
+                if (!currentEmail) {
+                    return showMessage("error", "Email is missing. Please restart the process.");
+                }
+                if (!otp) {
+                    return showMessage("error", "Please enter the OTP.");
+                }
+                
+                $verifyOtpBtn.prop('disabled', true).text("Verifying...");
+                showMessage("info", "Verifying code...");
+
+                $.ajax({
+                    url: `${API_BASE}/forgot-verify-otp`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: currentEmail, otp: otp }),
+                    dataType: 'json',
+
+                    success: function(response) {
+                        showMessage("success", response.message || "OTP verified. Proceed to set your new password (Step 3).");
+                        
+                        // Transition to Step 3 after showing success message
+                        setTimeout(() => { 
+                             clearMessages(); // Clear success message upon transition
+                             $step2.hide();
+                             $step3.show();
+                             $("#newPassword").focus();
+                        }, 2000); 
+                        
+
+                    },
+
+                    error: function(xhr) {
+                        const message = getErrorMessage(xhr);
+                        showMessage("error", message);
+                    },
+                    
+                    complete: function() {
+                        $verifyOtpBtn.prop('disabled', false).text("Verify OTP");
+                    }
+                });
+            });
+
+            // --- Step 3: Reset Password ---
+            $resetPasswordBtn.on('click', function() {
+                const newPassword = $("#newPassword").val().trim();
+                const confirmPassword = $("#confirmPassword").val().trim();
+                const otp = $("#otp").val().trim(); // *** GET THE OTP AGAIN FOR THE FINAL REQUEST ***
+                
+                if (!currentEmail) {
+                    return showMessage("error", "Email is missing. Please restart the process.");
+                }
+                if (!newPassword || newPassword.length < 6) {
+                    return showMessage("error", "Please enter a new password (min 6 characters).");
+                }
+                if (newPassword !== confirmPassword) {
+                     return showMessage("error", "New password and confirmation password do not match.");
+                }
+                // Check if OTP is still available (should be, if Step 2 was passed)
+                if (!otp) {
+                    return showMessage("error", "OTP is missing. Please restart the verification process (Step 2).");
+                }
+                
+                $resetPasswordBtn.prop('disabled', true).text("Resetting...");
+                showMessage("info", "Attempting password reset...");
+                
+                $.ajax({
+                    url: `${API_BASE}/reset-password`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    // PASS THE OTP HERE SO THE BACK-END CAN VALIDATE EVERYTHING IN ONE GO
+                    data: JSON.stringify({ 
+                        email: currentEmail, 
+                        otp: otp, // *** ADDED OTP TO THE FINAL REQUEST PAYLOAD ***
+                        password: newPassword, 
+                        password_confirmation: confirmPassword 
+                    }), 
+                    dataType: 'json',
+
+                    success: function(response) {
+                        showMessage("success", "✅ Password successfully reset! Redirecting to login...");
+                        
+                        // Disable interaction after final success
+                        $resetPasswordBtn.prop('disabled', true);
+                        
+                        // Redirect to login page after a short delay
+                        setTimeout(() => {
+                            window.location.href = "index.html";
+                        }, 2000);
+                        
+                    },
+
+                    error: function(xhr) {
+                        const message = getErrorMessage(xhr);
+                        showMessage("error", message);
+                        $resetPasswordBtn.prop('disabled', false).text("Reset Password");
+                    },
+                    
+                    complete: function() {
+                         // Note: We only re-enable on error, success leads to redirect.
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
