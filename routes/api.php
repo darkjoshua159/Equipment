@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EquipmentController;
-use App\Http\Controllers\Api\UserController; 
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\OrderController;
 
 // --- PUBLIC ROUTES ---
 Route::post('/register', [UserController::class, 'register']);
@@ -20,11 +21,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('equipment', EquipmentController::class);
     
     // User Profile Routes
+    Route::apiResource('users', UserController::class)->except(['store']);
     Route::get('/user/profile', [UserController::class, 'profile']); // Get Profile
     Route::post('/logout', [UserController::class, 'logout']); // Logout
     
-    // Profile Update/Delete (FIXED LINE for POST override)
-    Route::match(['post', 'put', 'patch'], '/user/profile', [UserController::class, 'update']);
-    Route::delete('/user/profile', [UserController::class, 'destroy']);
-    
+    // Profile Update/Delete (explicitly point profile update route to updateProfile)
+    Route::match(['post', 'put', 'patch'], '/user/profile', [UserController::class, 'updateProfile']);
+    Route::delete('/user/profile', [UserController::class, 'destroyProfile']);
+
+    // Order Routes
+    Route::get('/my-orders', [OrderController::class, 'myOrders']);
+    Route::post('/my-orders', [OrderController::class, 'store']);
+    Route::post('/orders', [OrderController::class, 'store']);
 });
