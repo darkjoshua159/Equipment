@@ -172,19 +172,23 @@
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
         .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; } /* Added for consistency */
         .w-\[5\%\] { width: 5%; }
         .w-\[10\%\] { width: 10%; }
+        .w-\[15\%\] { width: 15%; } /* NEW SIZE */
+        .w-\[20\%\] { width: 20%; } /* NEW SIZE */
         .w-\[25\%\] { width: 25%; }
         .w-\[40\%\] { width: 40%; }
         .text-white { color: #ffffff; }
         .font-semibold { font-weight: 600; }
         .text-green-400 { color: #4ade80; }
+        .text-yellow-400 { color: #facc15; } /* Used for available status */
+        .text-red-400 { color: #f87171; } /* Used for not available status */
         .font-bold { font-weight: 700; }
         .text-xs { font-size: 0.75rem; }
         .max-w-lg { max-width: 32rem; }
         .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
-        .text-yellow-400 { color: #facc15; }
         .hover\:text-yellow-300:hover { color: #fde047; }
         .text-red-500 { color: #ef4444; }
         .hover\:text-red-400:hover { color: #f87171; }
@@ -207,7 +211,8 @@
                 <h5 id="userFullName">Loading....</h5>
             </div>
             <div class="sidebar-buttons mt-4">
-                <button id="equipmentBtn" class="active">🧰 Manage Equipment</button>
+                <button id="equipmentBtn" class="active">🧰 <span id="equipmentBtnText">Manage Equipment</span></button>
+                <button id="usersBtn">🧑‍💻 <span id="usersBtnText">Manage Users</span></button>
                 <button id="profileBtn">👤 Edit Profile</button>
             </div>
         </div>
@@ -215,41 +220,54 @@
     </div>
 
     <div class="content">
+
+        <!-- ADMIN EQUIPMENT -->
         <div id="equipmentSection">
             <div class="content-header">
-                <h2>Equipment Inventory</h2>
-                <input
-                    type="text"
-                    class="search-bar"
-                    id="searchInput"
-                    placeholder="Search equipment..."
-                />
+                <h2>Manage Equipment</h2>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input
+                        type="text"
+                        class="search-bar"
+                        id="searchInput"
+                        placeholder="Search equipment..."
+                    />
+                    <select id="statusFilter" class="search-bar" style="width:160px;">
+                        <option value="">All Statuses</option>
+                        <option value="available">Available</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="not available">Not Available</option>
+                    </select>
+                </div>
             </div>
             
             <div class="overflow-x-auto mt-4">
                 <table class="w-full table-auto text-sm text-left text-gray-400">
                     <thead class="text-xs text-cyan-400 uppercase bg-gray-700">
                         <tr>
-                            <th scope="col" class="py-3 px-2 w-[5%]">ID</th>
+                            
                             <th scope="col" class="py-3 px-6 w-[10%]">Image</th>
-                            <th scope="col" class="py-3 px-6 w-[25%]">Name</th>
-                            <th scope="col" class="py-3 px-6 w-[10%]">Price</th>
-                            <th scope="col" class="py-3 px-6 w-[40%]">Description</th>
+                            <th scope="col" class="py-3 px-6 w-[20%]">Name</th>
+                            <th scope="col" class="py-3 px-6 w-[30%]">Description</th>
+                            <th scope="col" class="py-3 px-4 w-[10%]">Price</th>
+                            <th scope="col" class="py-3 px-4 w-[10%] text-center">Quantity</th>
+                            <th scope="col" class="py-3 px-4 w-[15%] text-center">Status</th>
                             <th scope="col" class="py-3 px-4 w-[10%] text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="equipmentTable">
                         <tr>
-                            <td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td>
+                            <td colspan="8" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <button id="addBtn" class="btn-add">➕ Add Equipment</button>
+            <button id="addEquipmentBtn" class="btn-add">➕ Add Equipment</button>
         </div>
 
+        <!-- PROFILE -->
         <div id="profileSection" style="display:none;">
-            <h2>Edit Profile</h2>
+            <h2>Manage Profile</h2>
             <form id="profileForm" class="mt-4">
                 <div class="mb-3">
                     <label class="form-label">First Name</label>
@@ -287,8 +305,54 @@
                 <button id="saveProfileBtn" type="submit">💾 Save Changes</button>
             </form>
         </div>
+
+        <!-- ADMIN USER -->
+        <div id="usersContent" class="main-content-area" style="display: none;">
+            <div class="content-header">
+                <h2>Manage User</h2>
+                <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+                    <input
+                        type="text"
+                        class="search-bar"
+                        id="userSearchInput"
+                        style="width:260px;"
+                        placeholder="Search users..."
+                    />
+                    <select id="userRoleFilter" class="search-bar" style="width:140px;">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="seller">Seller</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full table-auto text-sm text-left text-gray-400">
+                    <thead id="userTableHeader" class="text-xs text-cyan-400 uppercase bg-gray-700">
+                        <tr>
+                            <th scope="col" class="py-3 px-6 w-[10%]">Image</th>
+                            <th scope="col" class="py-3 px-6 w-[15%]">First Name</th> 
+                            <th scope="col" class="py-3 px-6 w-[15%]">Last Name</th> 
+                            <th scope="col" class="py-3 px-6 w-[20%]">Email</th>
+                            <th scope="col" class="py-3 px-4 w-[10%] text-center">Role</th>
+                            <th scope="col" class="py-3 px-4 w-[15%] text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">
+                                Select Manage Users to load data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button id="addUserBtn" class="btn-add">➕ Add User</button>
+        </div>    
     </div>
 
+    <!-- ADMIN ADD EQUIPMENT -->
     <div
         class="modal fade"
         id="equipmentModal"
@@ -314,12 +378,24 @@
                             <input type="text" id="name" name="name" class="form-control" required />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" id="price" name="price" class="form-control" required />
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" id="price" name="price" class="form-control" required step="0.01" min="0" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" id="quantity" name="quantity" class="form-control" required min="0" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select id="status" name="status" class="form-control">
+                                <option value="available">Available</option>
+                                <option value="not available">Not Available</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Image</label>
@@ -344,6 +420,151 @@
             </div>
         </div>
     </div>
+
+    <!-- ADMIN ADD USER -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="userModalTitle">Add User</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="userForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="userId" name="id">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="userFirstName">First Name</label>
+                            <input type="text" id="userFirstName" name="firstname" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userLastName">Last Name</label>
+                            <input type="text" id="userLastName" name="lastname" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userEmail">Email</label>
+                            <input type="email" id="userEmail" name="email" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userUsername">Username</label>
+                            <input type="text" id="userUsername" name="username" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userRole">Role</label>
+                            <select id="userRole" name="role" class="form-control" required>
+                                <option value="customer">Customer</option>
+                                <option value="seller">Seller</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userPassword">Password</label>
+                            <input type="password" id="userPassword" name="password" class="form-control" placeholder="Leave blank to keep current password" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="userImage">Profile Image</label>
+                            <input type="file" id="userImage" name="image" class="form-control" accept="image/*" />
+                            <div class="mt-2 text-center">
+                                <img
+                                    id="userPreviewImage"
+                                    src=""
+                                    alt=""
+                                    width="100"
+                                    class="rounded shadow-sm mt-2"
+                                    style="display:none;"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-info">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOMER ORDER DETAIL MODAL -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-gray-900 text-white border border-cyan-500">
+                <div class="modal-header border-b border-gray-700">
+                    <h5 class="modal-title text-cyan-400">Order Receipt</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img id="detailEquipImage" src="" class="w-32 h-32 object-cover rounded mx-auto border-2 border-cyan-900 mb-2">
+                        <h4 id="detailEquipName" class="capitalize font-bold"></h4>
+                    </div>
+                    <div class="space-y-3">
+                       <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Date:</span>
+                            <span id="detailDate"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Order ID:</span>
+                            <span id="detailOrderId" class="font-mono"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Quantity:</span>
+                            <span id="detailQuantity"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Status:</span>
+                            <span id="detailStatus" class="font-bold"></span>
+                        </div>
+                        <div class="flex justify-between pt-4">
+                            <span class="text-xl font-bold">Total Price:</span>
+                            <span id="detailTotal" class="text-xl font-bold text-green-400"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-gray-700">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="printReceiptBtn" class="btn btn-info" onclick="window.print()">Print Receipt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CUSTOMER CHECKOUT MODAL -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-gray-900 text-white border border-gray-700">
+                <div class="modal-header border-b border-gray-800">
+                    <h5 class="modal-title text-cyan-400 font-bold">🛒 Confirm Order</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img id="checkoutEquipImage" src="" class="w-32 h-32 object-cover rounded mx-auto border-2 border-cyan-900 mb-2">
+                        <h4 id="checkoutEquipName" class="capitalize font-bold text-cyan-400 text-2xl"></h4>
+                    </div>
+                    <div class="space-y-3 px-4">
+                        <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Unit Price:</span>
+                            <span id="checkoutEquipPrice"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Quantity:</span>
+                            <input type="number" id="checkoutQtyInput" value="1" min="1" class="w-20 bg-gray-800 border border-cyan-900 rounded px-2 text-center text-white">
+                        </div>
+                        <div class="flex justify-between pt-4">
+                            <span class="text-xl font-bold">Total Amount:</span>
+                            <span id="checkoutTotalDisplay" class="text-xl font-bold text-green-400"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-gray-800">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" onclick="confirmFinalOrder()" class="btn btn-success px-4 font-bold">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -354,6 +575,7 @@
     // Use jQuery selectors for elements
     const $tableBody = $("#equipmentTable");
     const MODAL = new bootstrap.Modal(document.getElementById("equipmentModal"));
+    const USER_MODAL = new bootstrap.Modal(document.getElementById("userModal"));
     const $previewImage = $("#previewImage");
     const $equipmentForm = $("#equipmentForm");
     const $profileForm = $("#profileForm");
@@ -361,22 +583,136 @@
     // Sidebar switching (keeping native event listeners as they were simple)
     const equipmentBtn = document.getElementById("equipmentBtn");
     const profileBtn = document.getElementById("profileBtn");
+    const usersBtn = document.getElementById("usersBtn");
     const equipmentSection = document.getElementById("equipmentSection");
     const profileSection = document.getElementById("profileSection");
+    const usersSection = document.getElementById("usersContent");
 
     equipmentBtn.addEventListener("click", () => {
         equipmentSection.style.display = "block";
         profileSection.style.display = "none";
+        usersSection.style.display = "none";
         equipmentBtn.classList.add("active");
         profileBtn.classList.remove("active");
+        usersBtn.classList.remove("active");
     });
 
     profileBtn.addEventListener("click", () => {
-        equipmentSection.style.display = "none";
         profileSection.style.display = "block";
+        equipmentSection.style.display = "none";
+        usersSection.style.display = "none";
         profileBtn.classList.add("active");
         equipmentBtn.classList.remove("active");
-        loadUserProfile(); // Reload profile data when switching view
+        usersBtn.classList.remove("active");
+        loadUserProfile();
+    });
+
+    usersBtn.addEventListener("click", () => {
+        usersSection.style.display = "block";
+        equipmentSection.style.display = "none";
+        profileSection.style.display = "none";
+        usersBtn.classList.add("active");
+        equipmentBtn.classList.remove("active");
+        profileBtn.classList.remove("active");
+
+        const role = localStorage.getItem("user_role");
+        if (role === 'customer') {
+            loadOrderHistory(); 
+        } else if (role === 'admin') {
+            loadUsers();
+        }
+    });
+
+    // ROLE BASE
+    function applyRolePermissions(role) {
+        // 1. Save role for use in loadEquipment and other logic
+        localStorage.setItem("user_role", role);
+        console.log("Setting UI for role:", role);
+
+        // 2. UI RESET: Clear any customer-specific states or buttons
+        $("#checkoutGroup").remove(); // Remove checkout buttons if they exist
+        $("#addEquipmentBtn").show().removeClass('btn-warning btn-success').addClass('btn-add'); // Reset style
+        $("#usersBtn").show(); // Show by default, hide only for seller
+        
+        // 3. APPLY ROLE-SPECIFIC DESIGNS
+        if (role === 'customer') {
+            // --- CUSTOMER DESIGN ---
+            $("#equipmentBtn").html('🔍 Browse Equipment');
+            $("#usersBtn").html('📜 Order History');
+            $("#addUserBtn").hide();
+            $("#equipmentSection h2").text("Browse Available Units");
+            $("#usersContent h2").text("My Order History");
+
+            $("#addEquipmentBtn").hide(); // Hidden until a unit is selected
+            $("#actionsHeader").text("Selection"); // Rename table header
+
+        } else if (role === 'seller') {
+            // --- SELLER DESIGN ---
+            $("#equipmentBtn").html('📦 My Inventory');
+            $("#usersBtn").hide(); // Sellers do not manage other users
+            
+            $("#equipmentSection h2").text("Inventory Management");
+            $("#addEquipmentBtn").show().html('➕ Add New Item');
+            $("#actionsHeader").text("Actions");
+
+        } else {
+            // --- ADMIN DESIGN (Default) ---
+            $("#equipmentBtn").html('🧰 Manage Equipment');
+            $("#usersBtn").html('🧑‍💻 Manage Users').show();
+            
+            $("#equipmentSection h2").text("Equipment Management");
+            $("#usersContent h2").text("User Management");
+
+            $("#addEquipmentBtn").show().html('➕ Add Equipment');
+            $("#actionsHeader").text("Actions");
+        }
+    }
+
+    // LOAD USERS OR ORDER HISTORY BASED ON ROLE
+    $("#usersBtn").on("click", () => {
+        const role = localStorage.getItem("user_role");
+        const $header = $("#userTableHeader");
+        const $filter = $("#userRoleFilter"); // Use your existing ID
+        const $searchInput = $("#searchUsers"); // Target your search bar
+
+        if (role === 'admin') {
+            // --- ADMIN VIEW ---
+            $header.html(`
+                <tr>
+                    <th class="py-3 px-6">Image</th>
+                    <th class="py-3 px-6">First Name</th> 
+                    <th class="py-3 px-6">Last Name</th> 
+                    <th class="py-3 px-6">Email</th>
+                    <th class="py-3 px-4 text-center">Role</th>
+                    <th class="py-3 px-4 text-center">Actions</th>
+                </tr>
+            `);
+            
+            // Update filter for Admin
+            $filter.html(`
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="seller">Seller</option>
+                <option value="customer">Customer</option>
+            `);
+            $searchInput.attr("placeholder", "Search users...");
+            
+            loadUsers();
+
+        } else if (role === 'customer') { 
+            $filter.empty().html(`
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Declined</option>
+                <option value="delivered">Delivered</option>
+            `);
+            
+            $searchInput.attr("placeholder", "Search orders...");
+
+            // Ensure ONLY this is called for customers
+            loadOrderHistory(); 
+        }
     });
 
     // Logout
@@ -418,17 +754,31 @@
         }
     });
 
+    // Handle file preview change for User Image
+    $("#userImage").on("change", function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                $("#userPreviewImage").attr("src", event.target.result).show();
+            };
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            $("#userPreviewImage").attr("src", "").hide();
+        }
+    });
 
-    // 🔹 Load user profile info - UPDATED ROUTE TO /user/profile
+    // 🔹 Load user profile
     function loadUserProfile() {
         $.ajax({
-            // TARGETING YOUR DEFINED ROUTE: /user/profile
             url: `${API_BASE}/user/profile`, 
             method: 'GET',
             headers: { Authorization: `Bearer ${TOKEN}` },
             success: function(result) { 
                 const user = result.data || result;
                 if (!user) return;
+
+                // 🔹 TRIGGER ROLE UI CHANGES HERE
+                applyRolePermissions(user.role);
 
                 const baseUrl = API_BASE.replace("/api", "");
 
@@ -439,8 +789,8 @@
                 $("#lastName").val(user.lastname || '');
 
                 const profileImgPath = user.image
-                    ? user.image 
-                    : 'user_profiles/default.png';
+                    ? (user.image.startsWith('storage/') ? user.image : `storage/${user.image}`)
+                    : 'storage/user_profiles/default.png'; 
                 
                 const profileImg = `${baseUrl}/${profileImgPath}`;
 
@@ -455,7 +805,7 @@
         });
     }
 
-    // 🔹 Update profile info - UPDATED ROUTE TO /user/profile (POST with PUT override)
+    // 🔹 Update profile
     function updateProfile() {
         const formData = new FormData(document.getElementById("profileForm"));
         formData.append("_method", "PUT"); // Matches your backend route definition
@@ -484,14 +834,19 @@
         });
     }
 
-    // 🔹 Load all equipment - NO ROUTE CHANGE (Relies on Route::apiResource('equipment', ...))
-    function loadEquipment(searchTerm = "") {
-        const url = searchTerm ? `${API_BASE}/equipment?search=${encodeURIComponent(searchTerm)}` : `${API_BASE}/equipment`;
+    // 🔹 Load all equipment
+    function loadEquipment(searchTerm = "", statusFilter = "") {
+        let url = `${API_BASE}/equipment`;
+        const params = [];
+        if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
+        if (statusFilter) params.push(`status=${encodeURIComponent(statusFilter)}`);
+        if (params.length) url += `?${params.join('&')}`;
         
-        $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td></tr>`);
+        const userRole = localStorage.getItem("user_role");
+        $tableBody.html(`<tr><td colspan="8" class="p-4 text-center text-gray-400 bg-gray-800">Loading equipment...</td></tr>`);
 
         $.ajax({
-            url: url,
+            url: url, // Use the dynamic URL with params
             method: 'GET',
             headers: { Authorization: `Bearer ${TOKEN}` },
             success: function(data) {
@@ -502,61 +857,630 @@
                     let html = "";
                     equipmentData.forEach((eq, index) => {
                         const imgPath = eq.image 
-                            ? eq.image
-                            : 'user_profiles/default.png';
-                        const imgUrl = `${baseUrl}/${imgPath}`;
+                            ? (eq.image.startsWith('storage/') ? eq.image : `storage/${eq.image}`)
+                            : 'storage/user_profiles/default.png';
 
+                        const imgUrl = `${baseUrl}/${imgPath}`;
                         const rowBgClass = index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900';
+                        
+                        // --- START: CUSTOM STATUS & ACTION LOGIC ---
+                        let displayStatus = eq.status;
+                        let statusColorClass = 'text-white';
+                        let isActionDisabled = false;
+                        let buttonText = "Select Unit";
+
+                        // 1. Force "NOT AVAILABLE" if quantity is 0
+                        if (parseInt(eq.quantity) <= 0) {
+                            displayStatus = 'not available';
+                            statusColorClass = 'text-red-400 font-bold';
+                            isActionDisabled = true;
+                            buttonText = "Out of Stock";
+                        } 
+                        // 2. Handle Maintenance status
+                        else if (eq.status === 'maintenance') {
+                            displayStatus = 'maintenance';
+                            statusColorClass = 'text-yellow-400 font-bold';
+                            isActionDisabled = true;
+                            buttonText = "Under Repair";
+                        } 
+                        // 3. Normal Available status
+                        else if (eq.status === 'available') {
+                            statusColorClass = 'text-green-400 font-bold';
+                        }
+
+                        let actionButtons = "";
+                        if (userRole === 'customer') {
+                            // For customers: Disable button if Maintenance or 0 Stock
+                            actionButtons = `
+                                <button class="btn btn-sm btn-outline-info rounded-pill px-3" 
+                                        onclick="selectUnit(this, ${eq.id})" 
+                                        ${isActionDisabled ? 'disabled' : ''}>
+                                    ${isActionDisabled ? buttonText : 'Select Unit'}
+                                </button>`;
+                        } else {
+                            // Admin/Seller actions remain active
+                            actionButtons = `
+                                <button class="text-yellow-400 hover:text-yellow-300 transition" onclick="editEquipment(${eq.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-500 hover:text-red-400 transition" onclick="deleteEquipment(${eq.id})">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>`;
+                        }
+                        // --- END: CUSTOM STATUS & ACTION LOGIC ---
 
                         html += `
-                            <tr class="border-b border-gray-700 hover:bg-gray-700 ${rowBgClass}">
-                                
-                                <td class="py-3 px-2 font-medium text-white whitespace-nowrap">${eq.id}</td>
-
+                            <tr id="row-${eq.id}" class="border-b border-gray-700 hover:bg-gray-700 ${rowBgClass} transition-colors">
                                 <td class="py-2 px-6">
-                                    <img 
-                                        src="${imgUrl}" 
-                                        onerror="this.src='${baseUrl}/user_profiles/default.png'" 
-                                        alt="${eq.name}"
-                                        class="w-16 h-16 object-cover rounded-md"
-                                    >
+                                    <img src="${imgUrl}" onerror="this.src='${baseUrl}/storage/user_profiles/default.png'" class="w-16 h-16 object-cover rounded-md">
                                 </td>
-
                                 <td class="py-4 px-6 text-white font-semibold">${eq.name || "—"}</td>
-
-                                <td class="py-4 px-6 text-green-400 font-bold">$${parseFloat(eq.price).toFixed(2) || "0.00"}</td>
-
-                                <td class="py-4 px-6">
-                                    <p class="text-xs max-w-lg truncate" title="${eq.description || ''}">${eq.description || "No description provided."}</p>
-                                </td>
-
-                                <td class="py-4 px-4 text-center space-x-2">
-                                    <button class="text-yellow-400 hover:text-yellow-300 transition" 
-                                            onclick="editEquipment(${eq.id})" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-400 transition" 
-                                            onclick="deleteEquipment(${eq.id})" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-
-                            </tr>
-                        `;
+                                <td class="py-4 px-6 text-white text-sm">${eq.description || "No description."}</td>
+                                <td class="py-4 px-4 text-green-400 font-bold">$${parseFloat(eq.price).toFixed(2)}</td>
+                                <td class="py-4 px-4 text-center text-white">${eq.quantity || 0}</td>
+                                <td class="py-4 px-4 text-center ${statusColorClass} text-xs uppercase">${displayStatus || 'N/A'}</td>
+                                <td class="py-4 px-4 text-center space-x-2">${actionButtons}</td>
+                            </tr>`;
                     });
                     $tableBody.html(html);
                 } else {
-                    $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-gray-400 bg-gray-800">No equipment found.</td></tr>`);
+                    $tableBody.html(`<tr><td colspan="8" class="p-4 text-center text-gray-400 bg-gray-800">No equipment found.</td></tr>`);
                 }
             },
             error: function(jqXHR) {
-                console.error("Error loading equipment:", jqXHR.responseJSON || jqXHR.responseText);
-                $tableBody.html(`<tr><td colspan="6" class="p-4 text-center text-red-400 bg-gray-800">Failed to load equipment data. Check your API token or server status.</td></tr>`);
+                $tableBody.html(`<tr><td colspan="8" class="p-4 text-center text-red-400 bg-gray-800">Failed to load data.</td></tr>`);
             }
         });
     }
 
-    // Global function used by the onclick handlers
+    let selectedEquipmentId = null;
+
+    // This replaces the Edit/Delete icons for Customers
+    window.selectUnit = function(btn, id) {
+        const row = $(btn).closest("tr");
+        // Column 5 is Quantity, Column 6 is Status
+        const qty = parseInt(row.find('td:nth-child(5)').text());
+        const status = row.find('td:nth-child(6)').text().trim().toUpperCase();
+
+        if (status === 'MAINTENANCE' || qty <= 0) {
+            alert("This unit is currently unavailable for order.");
+            return;
+        }
+
+        // Highlight the row
+        $("#equipmentTable tr").removeClass("bg-cyan-900 border-info");
+        row.addClass("bg-cyan-900 border-info");
+        
+        selectedEquipmentId = id;
+
+        // Show the Checkout button at the bottom
+        if (localStorage.getItem("user_role") === 'customer') {
+            $("#addEquipmentBtn")
+                .stop().fadeIn()
+                .html('🛒 Order Selected Unit')
+                .off('click').on('click', showCustomerCheckout);
+        }
+    };
+
+    function showCustomerCheckout() {
+        // 1. Create the floating buttons
+        const actionHtml = `
+            <div id="customerActions" class="d-flex gap-2" style="position: fixed; bottom: 25px; right: 25px; z-index: 999;">
+                <button class="btn btn-secondary rounded-pill px-4 shadow-lg" onclick="cancelCustomerOrder()">❌ Cancel</button>
+                <button id="triggerModalBtn" class="btn btn-success rounded-pill px-4 shadow-lg">✅ Checkout</button>
+            </div>
+        `;
+
+        // 2. Clear old actions if they exist and append new ones
+        $("#customerActions").remove();
+        $("#addEquipmentBtn").hide(); 
+        $("body").append(actionHtml); 
+
+        // 3. ATTACH THE MODAL TRIGGER TO THE NEW BUTTON
+        $("#triggerModalBtn").on('click', function() {
+            processCheckout(); // This calls your existing function that opens the modal
+        });
+    }
+
+    window.cancelCustomerOrder = function() {
+        $("#customerActions").remove();
+        $("#equipmentTable tr").removeClass("bg-cyan-900 border-info");
+        selectedEquipmentId = null;
+        // Don't show the add button again for customer until they select a new row
+    };
+
+    // Confirm final order after filling quantity
+    window.confirmFinalOrder = function() {
+        // You defined it as 'qty' here
+        const qty = parseInt($("#checkoutQtyInput").val());
+        
+        // Get available stock from the highlighted row
+        const selectedRow = $("#equipmentTable tr.bg-cyan-900");
+        const availableStock = parseInt(selectedRow.find('td:nth-child(5)').text());
+
+        // FIX: Change 'qtyInput' to 'qty' to match your declaration
+        if (qty > availableStock) {
+            alert(`Insufficient stock. Only ${availableStock} units left.`);
+            return;
+        }
+
+        if (!currentOrderData.id || qty < 1) {
+            alert("Invalid order details.");
+            return;
+        }
+
+        const finalTotal = currentOrderData.price * qty;
+
+        $.ajax({
+            url: `${API_BASE}/my-orders`, 
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${TOKEN}`,
+                'Accept': 'application/json' 
+            },
+            data: {
+                equipment_id: currentOrderData.id,
+                quantity: qty,
+                total_price: finalTotal,
+                status: 'pending' 
+            },
+            success: function(response) {
+                alert("Order successful!");
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+                if (modalInstance) modalInstance.hide();
+                
+                cancelCustomerOrder(); 
+                
+                // Optional: Refresh the equipment table to update the quantity display
+                if (typeof loadEquipment === "function") loadEquipment();
+                
+                $("#OrderHistoryBtn").click(); 
+            },
+            error: function(xhr) {
+                console.error("Error details:", xhr.responseText);
+                alert("Failed to place order.");
+            }
+        });
+    };
+
+    // 🔹 Customer Checkout Modal Logic
+    let currentOrderData = { id: null, price: 0 };
+
+    window.processCheckout = function() {
+        // 1. Find the highlighted row
+        const selectedRow = $("#equipmentTable tr.bg-cyan-900");
+        
+        if (!selectedRow.length) {
+            alert("Please select a unit first!");
+            return;
+        }
+
+        // 2. Extract Data from columns
+        // Column 1: Image, Column 2: Name, Column 4: Price
+        const name = selectedRow.find('td:nth-child(2)').text();
+        const priceText = selectedRow.find('td:nth-child(4)').text().replace('$', '').trim();
+        const price = parseFloat(priceText);
+        const imgSrc = selectedRow.find('td:nth-child(1) img').attr('src');
+        
+        // Store in your global variable
+        currentOrderData = { id: selectedEquipmentId, price: price };
+
+        // 3. Populate Modal Fields
+        $("#checkoutEquipName").text(name);
+        $("#checkoutEquipPrice").text(`$${price.toFixed(2)}`);
+        $("#checkoutEquipImage").attr("src", imgSrc);
+        $("#checkoutQtyInput").val(1);
+        
+        // Calculate initial total
+        updateCheckoutTotal();
+        
+        // 4. Trigger the Modal
+        const checkoutModal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+        checkoutModal.show();
+    };
+
+    // Function to update total price based on quantity input
+    function updateCheckoutTotal() {
+        const qty = parseInt($("#checkoutQtyInput").val()) || 1;
+        const total = currentOrderData.price * qty;
+        $("#checkoutTotalDisplay").text(`$${total.toFixed(2)}`);
+    }
+
+    // Listen for quantity changes inside the modal
+    $(document).on("input", "#checkoutQtyInput", updateCheckoutTotal);
+
+    // 🔹 Load order history for customers
+    function loadOrderHistory(statusFilter = "") {
+        const role = localStorage.getItem("user_role");
+        const $header = $("#userTableHeader");
+        const tableBody = $("#userTableBody");
+
+        $header.html(`
+            <tr>
+                <th class="py-3 px-6">Order ID</th>
+                <th class="py-3 px-6">Date</th> 
+                <th class="py-3 px-6">Equipment</th> 
+                <th class="py-3 px-6">Quantity</th>
+                <th class="py-3 px-6">Total Price</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-center">Actions</th>
+            </tr>
+        `);
+
+        tableBody.html(`<tr><td colspan="7" class="p-4 text-center">Loading orders...</td></tr>`);
+
+        // Dynamic URL based on whether a filter is selected
+        let url = `${API_BASE}/my-orders`;
+        if (statusFilter && statusFilter !== "All Statuses" && statusFilter !== "") {
+            url += `?status=${encodeURIComponent(statusFilter.toLowerCase())}`;
+        }
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(response) {
+                let orders = response.data || response;
+                tableBody.empty();
+                
+                // 🔹 1. CUSTOM SORTING LOGIC
+                const sortOrder = { 'pending': 1, 'delivered': 2, 'approved': 3, 'declined': 4 };
+                
+                orders.sort((a, b) => {
+                    const statusA = a.status.toLowerCase().trim();
+                    const statusB = b.status.toLowerCase().trim();
+                    return (sortOrder[statusA] || 99) - (sortOrder[statusB] || 99);
+                }); 
+                
+                // Client-side fallback filter if backend doesn't support query params yet
+                if (statusFilter && statusFilter !== "All Statuses") {
+                    orders = orders.filter(o => o.status.toLowerCase() === statusFilter.toLowerCase());
+                }
+
+                if (!orders || orders.length === 0) {
+                    tableBody.append(`<tr><td colspan="7" class="p-4 text-center text-gray-400">No matching orders found.</td></tr>`);
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const orderId = `#${order.id}`;
+                    const equipmentName = order.equipment ? order.equipment.name : 'Unknown Unit';
+                    const quantity = order.quantity || 1;
+                    const totalPrice = `$${parseFloat(order.total_price).toFixed(2)}`;
+                    const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric'
+                    }) : 'N/A';
+
+                    // --- STATUS COLORS LOGIC ---
+                    let statusColorClass = "";
+                    const currentStatus = order.status.toLowerCase().trim();
+
+                    if (currentStatus === 'pending') {
+                        statusColorClass = 'text-cyan-400 font-bold'; // Pending -> Cyan (matches UI)
+                    } else if (currentStatus === 'delivered') {
+                        statusColorClass = 'text-orange-500 font-bold'; // Delivered -> Orange
+                    } else if (currentStatus === 'approved') {
+                        statusColorClass = 'text-green-500 font-bold'; // Approved -> Green
+                    } else if (currentStatus === 'declined') {
+                        statusColorClass = 'text-red-500 font-bold'; // Declined -> Red
+                    } else {
+                        statusColorClass = 'text-gray-400'; // Fallback
+                    }
+
+                    tableBody.append(`
+                        <tr class="border-b border-gray-700 hover:bg-gray-800">
+                            <td class="py-4 px-6 text-white">#${order.id}</td>
+                            <td class="py-4 px-6 text-white">${orderDate}</td>
+                            <td class="py-4 px-6 text-white capitalize">${equipmentName}</td>
+                            <td class="py-4 px-6 text-white text-center">${quantity}</td> 
+                            <td class="py-4 px-6 text-green-400 font-bold">${totalPrice}</td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="${statusColorClass}">${order.status.toUpperCase()}</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <button class="btn btn-sm btn-outline-info" onclick="viewOrderDetails(${order.id})">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            },
+            error: function() {
+                tableBody.html(`<tr><td colspan="7" class="p-4 text-center text-red-400">Unable to load orders.</td></tr>`);
+            }
+        });
+    }
+
+    $(document).on("change", "#userRoleFilter", function() {
+    const selected = $(this).val().toLowerCase();
+    
+        $("#userTableBody tr").each(function() {
+            // FIX: In your table, Status is the 6th <td>
+            const rowStatus = $(this).find('td:nth-child(6) span').text().trim().toLowerCase();
+            
+            // Handle "All Statuses" or empty selection
+            if (selected === "" || selected === "all statuses" || rowStatus === selected) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    // 🔹 View order details in modal
+    window.viewOrderDetails = function(orderId) {
+        const detailModal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+
+        $.ajax({
+            url: `${API_BASE}/my-orders`,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(response) {
+                const orders = response.data || response;
+                const order = orders.find(o => o.id == orderId);
+
+                if (order) {
+                    // Formatting Date and Time
+                    const dateObj = new Date(order.created_at);
+                    const formattedDateTime = dateObj.toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                    });
+
+                    // Populate Modal Data
+                    $("#detailEquipName").text(order.equipment?.name || 'Unknown');
+                    $("#detailDate").text(formattedDateTime);
+                    $("#detailOrderId").text(`#${order.id}`);
+                    $("#detailQuantity").text(order.quantity || 1); 
+                    $("#detailStatus").text(order.status.toUpperCase());
+                    $("#detailTotal").text(`$${parseFloat(order.total_price).toFixed(2)}`);
+                    
+                    // Set Image
+                    const baseUrl = API_BASE.replace("/api", "");
+                    const imgSrc = order.equipment?.image ? `${baseUrl}/storage/${order.equipment.image}` : `${baseUrl}/storage/default.png`;
+                    $("#detailEquipImage").attr("src", imgSrc);
+
+                    // --- NEW LOGIC: CONDITIONAL PRINT BUTTON ---
+                    // Target the Print Receipt button in your modal
+                    const printBtn = $("#printReceiptBtn"); 
+                    
+                    if (order.status.toLowerCase() === 'approved') {
+                        // Show button only if status is approved
+                        printBtn.show(); 
+                        $("#approvalWarning").addClass("d-none"); // Hide warning if it exists
+                    } else {
+                        // Hide button if pending
+                        printBtn.hide(); 
+                        // Optional: Show a message telling the user they need approval
+                        if ($("#approvalWarning").length === 0) {
+                            printBtn.after('<span id="approvalWarning" class="text-warning text-sm ms-2">Awaiting seller approval to print</span>');
+                        } else {
+                            $("#approvalWarning").removeClass("d-none");
+                        }
+                    }
+
+                    detailModal.show();
+                }
+            },
+            error: function() {
+                alert("Could not load order details.");
+            }
+        }); 
+    };
+
+    window.approveOrder = function(orderId) {
+        if (!confirm("Approve this order?")) return;
+
+        $.ajax({
+            url: `${API_BASE}/orders/${orderId}/approve`, 
+            method: 'POST',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function() {
+                alert("Order Approved!");
+                loadOrderHistory(); // Refresh the table to see the status change
+            },
+            error: function() {
+                alert("Failed to approve order.");
+            }
+        });
+    };
+
+    // 🔹 Load all USER
+    function loadUsers(searchTerm = "", roleFilter = "") {
+        if (localStorage.getItem("user_role") !== 'admin') return;
+        const tableBody = $("#userTableBody");
+        // Colspan is 8 (ID, Image, First Name, Last Name, Email, Role, Status, Actions)
+        tableBody.html(`<tr><td colspan="8" class="p-4 text-center text-gray-400 bg-gray-800">Loading users...</td></tr>`); 
+
+        // Build URL with optional filters
+        let url = `${API_BASE}/users`;
+        const params = [];
+        if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
+        if (roleFilter) params.push(`role=${encodeURIComponent(roleFilter)}`);
+        // fallback to UI values if not passed
+        if (!searchTerm && $("#userSearchInput").length) {
+            const q = $("#userSearchInput").val(); if (q) params.push(`search=${encodeURIComponent(q)}`);
+        }
+        if (!roleFilter && $("#userRoleFilter").length) {
+            const r = $("#userRoleFilter").val(); if (r) params.push(`role=${encodeURIComponent(r)}`);
+        }
+        if (params.length) url += `?${params.join('&')}`;
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(response) {
+                const users = response.data || response; 
+                tableBody.empty();
+
+                if (!Array.isArray(users) || users.length === 0) {
+                    const message = (users && users.length === 0) ? "No users found in the database." : "Error loading users. API returned invalid data (check console).";
+                    tableBody.append(`<tr><td colspan="8" class="p-4 text-center text-warning bg-gray-800">${message}</td></tr>`);
+                    if (!Array.isArray(users)) console.error("API response is not an array. Response:", response);
+                    return;
+                }
+
+                const baseUrl = API_BASE.replace("/api", "");
+                users.forEach((user, index) => {
+                    const isCurrentUser = user.id == localStorage.getItem('user_id');
+                    const rowBgClass = index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900';
+                    const roleDisplay = displayUserRole(user.role);
+                    const userImage = user.image ? (user.image.startsWith('storage/') ? user.image : `storage/${user.image}`) : 'storage/user_profiles/default.png';
+                    const imgUrl = `${baseUrl}/${userImage}`;
+
+                    const row = `
+                        <tr id="user-row-${user.id}" class="border-b border-gray-700 hover:bg-gray-700 ${rowBgClass}">
+                            <td class="py-2 px-6">
+                                <img src="${imgUrl}" onerror="this.src='${baseUrl}/storage/user_profiles/default.png'" alt="${user.firstname}" class="w-16 h-16 object-cover rounded-md">
+                            </td>
+                            <td class="py-4 px-6 text-white">${user.firstname || '—'}</td>
+                            <td class="py-4 px-6 text-white">${user.lastname || '—'}</td>
+                            <td class="py-4 px-6 text-white">${user.email || '—'}</td>
+                            <td class="py-4 px-4 text-center">${roleDisplay}</td>
+                            <td class="py-4 px-4 text-center space-x-2">
+                                <button class="text-yellow-400 hover:text-yellow-300 transition" onclick="editUser(${user.id})" title="Edit" ${isCurrentUser ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
+                                <button class="text-red-500 hover:text-red-400 transition" onclick="deleteUser(${user.id})" title="Delete" ${isCurrentUser ? 'disabled' : ''}><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            },
+            error: function(jqXHR) {
+                console.error("Error fetching user data:", jqXHR.responseJSON || jqXHR.responseText);
+                tableBody.empty().append('<tr><td colspan="8" class="p-4 text-center text-red-400 bg-gray-800">Failed to load users. (Check server logs/403 forbidden).</td></tr>');
+                alert("Failed to load users. Check console for error details (403 Forbidden means non-Admin access).");
+            }
+        });
+    }
+
+    // ROLE
+    function displayUserRole(currentRole) {
+        let colorClass = 'text-white';
+        if (currentRole === 'admin') {
+            colorClass = 'text-red-400 font-bold';
+        } else if (currentRole === 'seller') {
+            colorClass = 'text-yellow-400 font-bold';
+        } else if (currentRole === 'customer') {
+            colorClass = 'text-green-400';
+        }
+        return `<span class="${colorClass} text-xs uppercase">${currentRole}</span>`;
+    }
+
+    function buildStatusDropdown(userId, currentStatus, isDisabled) {
+        const statuses = ['active', 'inactive'];
+        let options = statuses.map(status => `
+            <option value="${status}" ${status === currentStatus ? 'selected' : ''}>
+                ${status.toUpperCase()}
+            </option>
+        `).join('');
+
+        // Add an onChange handler to update the user when the status changes
+            return `
+                <select class="form-control form-control-sm" 
+                        onchange="updateUserRoleStatus(${userId}, 'status', this.value)"
+                        ${isDisabled ? 'disabled' : ''}>
+                    ${options}
+                </select>
+        `;
+    }
+
+    // MANAGE USER
+    window.editUser = function(userId) {
+    // Relies on Route::apiResource('users', ...) -> GET /api/users/{id}
+        $.ajax({
+            url: `${API_BASE}/users/${userId}`,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            success: function(result) {
+                const user = result.data || result;
+                if (!user) return alert("User data not found.");
+
+                // 1. Populate the Modal Form Fields
+                $("#userForm").data('mode', 'edit');
+                $("#userId").val(user.id);
+                $("#userModalTitle").text(`Edit User`);
+                $("#userFirstName").val(user.firstname || '');
+                $("#userLastName").val(user.lastname || '');
+                $("#userEmail").val(user.email || '');
+                $("#userRole").val(user.role || '');
+                $("#userUsername").val(user.username || '');
+                
+                // Leave password empty; user can set a new one if desired
+                $("#userPassword")
+                    .val("")
+                    .prop('readonly', false)
+                    .attr('placeholder', 'Leave blank to keep current password');
+
+                // Set preview image
+                const baseUrl = API_BASE.replace("/api", "");
+                const userImage = user.image 
+                    ? (user.image.startsWith('storage/') ? user.image : `storage/${user.image}`)
+                    : 'storage/user_profiles/default.png'; 
+                const imgSrc = `${baseUrl}/${userImage}`;
+                $("#userPreviewImage").attr("src", imgSrc).show();
+                $("#userImage").val("");
+
+                USER_MODAL.show();
+            },
+            error: function(jqXHR) {
+                console.error("Error fetching single user:", jqXHR.responseJSON || jqXHR.responseText);
+                alert("Failed to load user details for editing.");
+            }
+        });
+    };
+
+    // UPDATE STATUS
+    window.updateUserRoleStatus = function(userId, field, value) {
+        if (confirm(`Are you sure you want to change user ${userId}'s ${field} to ${value}?`)) {
+            // Prepare the data payload (only sending the field that changed)
+            const data = {};
+            data[field] = value;
+            
+            $.ajax({
+                url: `${API_BASE}/users/${userId}`,
+                method: 'PUT', // Route::apiResource uses PUT/PATCH for update
+                headers: { Authorization: `Bearer ${TOKEN}` },
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    alert(response.message);
+                    // No need to reload the whole table, the change is already visible in the dropdown
+                },
+                error: function(jqXHR) {
+                    console.error("Error updating user:", jqXHR.responseJSON || jqXHR.responseText);
+                    alert("Update failed. Check console and API error messages.");
+                    loadUsers(); // Reload table to reset state if update failed
+                }
+            });
+        } else {
+            loadUsers(); // Reverts the dropdown selection if the user cancels
+        }
+    };
+
+    // DELETE USER
+    window.deleteUser = function(userId) {
+        if (confirm("WARNING! Are you sure you want to permanently delete this user?")) {
+            $.ajax({
+                url: `${API_BASE}/users/${userId}`,
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${TOKEN}` },
+                success: function(response) {
+                    alert(response.message);
+                    // Remove the row from the table without a full reload
+                    $("#user-row-" + userId).remove();
+                },
+                error: function(jqXHR) {
+                    console.error("Error deleting user:", jqXHR.responseJSON || jqXHR.responseText);
+                    alert("Deletion failed.");
+                }
+            });
+        }
+    };
+
+    // MANAGE EQUIPMENT
     window.editEquipment = function(id) {
         // Relies on Route::apiResource('equipment', ...) -> GET /api/equipment/{id}
         $.ajax({
@@ -568,13 +1492,14 @@
                 
                 $("#equipmentId").val(eq.id);
                 $("#name").val(eq.name);
-                $("#price").val(eq.price);
                 $("#description").val(eq.description);
-                
+                $("#price").val(eq.price);
+                $("#quantity").val(eq.quantity); 
+                $("#status").val(eq.status);
                 $("#image").val(""); 
 
                 const baseUrl = API_BASE.replace("/api", "");
-                const imgSrc = eq.image ? `${baseUrl}/${eq.image}` : `${baseUrl}/user_profiles/default.png`;
+                const imgSrc = eq.image ? `${baseUrl}/${eq.image}` : `${baseUrl}/storage/user_profiles/default.png`;
                 
                 $previewImage.attr("src", imgSrc).show();
 
@@ -587,6 +1512,7 @@
         });
     }
 
+    // DELETE EQUIPMENT
     window.deleteEquipment = function(id) {
         // Relies on Route::apiResource('equipment', ...) -> DELETE /api/equipment/{id}
         if (!confirm("Are you sure you want to delete this equipment?")) return;
@@ -606,7 +1532,7 @@
     }
 
     // 🔹 Add new equipment
-    $("#addBtn").on("click", () => {
+    $("#addEquipmentBtn").on("click", () => {
         $equipmentForm[0].reset();
         $("#equipmentId").val("");
         $previewImage.attr("src", "").hide();
@@ -614,7 +1540,20 @@
         MODAL.show();
     });
 
-    // 🔹 Submit add/edit equipment 
+    // 🔹 Add new user
+    $("#addUserBtn").on("click", () => {
+        $("#userForm").data('mode', 'create');
+        $("#userId").val("");
+        $("#userModalTitle").text("Add New User");
+        $("#userFirstName, #userLastName, #userEmail, #userUsername, #userPassword").val("");
+        $("#userRole").val("customer");
+        $("#userPassword").prop('readonly', false).attr('placeholder', 'Set initial password');
+        $("#userImage").val("");
+        $("#userPreviewImage").attr("src", "").hide();
+        USER_MODAL.show();
+    });
+
+    // 🔹 Submit add/edit equipment     
     $equipmentForm.on("submit", function(e) {
         e.preventDefault();
 
@@ -650,11 +1589,127 @@
             }
         });
     });
+    
+    
+    // Add a submission handler for the user form in the modal
+    $("#userForm").on('submit', function(e) {
+        e.preventDefault(); 
+        
+        const mode = $("#userForm").data('mode') || 'create';
+        const userId = $("#userId").val();
+        const baseUserData = {
+            firstname: $("#userFirstName").val(),
+            lastname: $("#userLastName").val(),
+            email: $("#userEmail").val(),
+            role: $("#userRole").val(),
+            username: $("#userUsername").val(),
+            password: $("#userPassword").val()
+        };
 
-    // Search input listener
+        if (mode === 'edit' && userId) {
+            const updatedData = {
+                firstname: baseUserData.firstname,
+                lastname: baseUserData.lastname,
+                email: baseUserData.email,
+                role: baseUserData.role,
+                username: baseUserData.username
+            };
+
+            if (baseUserData.password && baseUserData.password !== '*** Not Editable ***') {
+                updatedData.password = baseUserData.password;
+            }
+
+            if (confirm("Are you sure you want to save these user changes?")) {
+                // Use FormData so we can upload an image file if provided
+                const fd = new FormData();
+                fd.append('_method', 'PUT');
+                fd.append('firstname', updatedData.firstname || '');
+                fd.append('lastname', updatedData.lastname || '');
+                fd.append('email', updatedData.email || '');
+                fd.append('role', updatedData.role || 'customer');
+                fd.append('username', baseUserData.username || '');
+                if (updatedData.password) fd.append('password', updatedData.password);
+
+                const fileInput = document.getElementById('userImage');
+                if (fileInput && fileInput.files && fileInput.files[0]) {
+                    fd.append('image', fileInput.files[0]);
+                }
+
+                $.ajax({
+                    url: `${API_BASE}/users/${userId}`,
+                    method: 'POST', // POST with _method=PUT override
+                    headers: { Authorization: `Bearer ${TOKEN}` },
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        alert(response.message || "User updated successfully.");
+                        USER_MODAL.hide(); 
+                        loadUsers();
+                    },
+                    error: function(jqXHR) {
+                        const err = jqXHR.responseJSON || { message: jqXHR.responseText || "Unknown error" };
+                        console.error("Error updating user from modal:", err);
+                        if (err.errors) {
+                            const messages = Object.values(err.errors).flat().join("\n");
+                            alert("Update failed:\n" + messages);
+                        } else {
+                            alert("Update failed: " + (err.message || jqXHR.responseText));
+                        }
+                    }
+                });
+            }
+            return;
+        }
+
+        // Create flow
+        if (!baseUserData.password) {
+            alert("Password is required for new users.");
+            return;
+        }
+
+        $.ajax({
+            url: `${API_BASE}/register`,
+            method: 'POST',
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            contentType: 'application/json',
+            data: JSON.stringify(baseUserData), 
+            success: function(response) {
+                alert(response.message || "User added successfully.");
+                USER_MODAL.hide(); 
+                loadUsers(); 
+            },
+            error: function(jqXHR) {
+                console.error("Error creating user:", jqXHR.responseJSON || jqXHR.responseText);
+                alert("Creation failed. Check console and API error messages.");
+            }
+        });
+    });
+
+    // Search input listener + status filter listener
     $("#searchInput").on('keyup', function() {
         const searchTerm = $(this).val();
-        loadEquipment(searchTerm); 
+        const status = $("#statusFilter").val();
+        loadEquipment(searchTerm, status);
+    });
+
+    $("#statusFilter").on('change', function() {
+        const status = $(this).val();
+        const searchTerm = $("#searchInput").val();
+        loadEquipment(searchTerm, status);
+    });
+
+    // User search + role listeners
+    $("#userSearchInput").on('keyup', function() {
+        const q = $(this).val();
+        const role = $("#userRoleFilter").val();
+        loadUsers(q, role);
+    });
+
+    $("#userRoleFilter").on('change', function() {
+        const role = $(this).val();
+        const q = $("#userSearchInput").val();
+        loadUsers(q, role);
     });
 
 
