@@ -161,9 +161,10 @@
 // IMPORTANT: Change this to your actual deployed Laravel API base URL.
 const API_BASE = "https://jflix.io/api";
 const API_BASE_URL = "https://jflix.io/api"; 
-const DASHBOARD_PAGE = "dashboard.html"; // Your main app page
 
-const LOGIN_URL = `${https://jflix.io/api}/login`;  
+const LOGIN_URL = `${API_BASE_URL}/login`;
+
+const DASHBOARD_PAGE = "dashboard.html"; // Your main app page  
 // Helper function to set the status message style using jQuery
 function setStatus(message, type) {
     // This function is defined globally to be accessible by the main logic.
@@ -288,6 +289,7 @@ $(function() {
 </script>
 </body>
 </html>
+
 
 
 
